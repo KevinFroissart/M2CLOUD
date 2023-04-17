@@ -1,0 +1,37 @@
+#docker run --name ldap -p 389:636 -e LDAP_ORGANISATION="adams corp" -e LDAP_DOMAIN="adams.org" -e LDAP_BASE_DN="dc=adams,dc=org" -e LDAP_ADMIN_PASSWORD="secret" -e LDAP_READONLY_USERNAME="lecteur" -e LDAP_READONLY_PASSWORD="passdulecteur" -v /srv/ldap:/var/lib/ldap -ip 172.17.0.10  -d osixia/openldap:1.2.0
+
+#docker run --name phpldapmyadmin -p 8080:80 -e PHPLDAPADMIN_HTTPS="false" -e PHPLDAPADMIN_LDAP_HOSTS="172.17.0.10" -d osixia/phpldapadmin:0.7.1
+
+version: '3'
+services:
+  ldap:
+    image: osixia/openldap:1.2.0
+    ports:
+      - 389:636
+    volumes:
+      - /srv/ldap:/var/lib/ldap
+    environment:
+      - LDAP_ORGANISATION="adams corp"
+      - LDAP_DOMAIN="adams.org"
+      - LDAP_BASE_DN="dc=adams,dc=org"
+      - LDAP_ADMIN_PASSWORD="secret"
+      - LDAP_READONLY_USERNAME="lecteur"
+      - LDAP_READONLY_PASSWORD="passdulecteur"
+    networks:
+      internal:
+        ipv4_address: 172.17.0.10
+  phpldapmyadmin:
+    image: osixia/phpldapadmin:0.7.1
+    depends_on:
+      - ldap
+    ports:
+      - 8080:80
+    environment:
+      - PHPLDAPADMIN_HTTPS="false"
+    links:
+      - ldap
+    networks:
+      - internal
+networks:
+    internal:
+        driver: bridge
