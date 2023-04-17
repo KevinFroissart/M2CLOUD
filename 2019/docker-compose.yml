@@ -1,0 +1,27 @@
+version: '3'
+services:
+  mysql:
+    image: mysql
+    volumes:
+      - /var/lib/mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=secret
+      - MYSQL_USER=TOTO
+      - MYSQL_PASSWORD=secret
+      - MYSQL_DATABASE=BASEWP
+
+  wordpress:
+    image: wordpress
+    ports:
+      - 9080:80
+    volumes:
+      - /var/www/html/wp/uploads:/var/www/html/wp/uploads
+    environment:
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_USER=TOTO
+      - WORDPRESS_DB_PASSWORD=secret
+      - WORDPRESS_DB_NAME=BASEWP
+      - PHP_VERSION=7
+    links:
+      - mysql
+
